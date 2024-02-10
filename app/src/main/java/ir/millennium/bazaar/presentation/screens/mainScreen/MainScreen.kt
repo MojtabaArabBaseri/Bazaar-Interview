@@ -40,24 +40,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import ir.millennium.bazaar.R
 import ir.millennium.bazaar.data.dataSource.remote.UiState
+import ir.millennium.bazaar.domain.entity.TypeTheme
+import ir.millennium.bazaar.presentation.activity.MainActivityViewModel
 import ir.millennium.bazaar.presentation.ui.theme.LocalCustomColorsPalette
-import ir.millennium.bazaar.presentation.ui.theme.White
 import ir.millennium.bazaar.presentation.utils.Constants.BACK_PRESSED
 import ir.millennium.bazaar.presentation.utils.OnBottomReached
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel()) {
+fun MainScreen(
+    mainScreenViewModel: MainScreenViewModel,
+    mainActivityViewModel: MainActivityViewModel
+) {
 
     val context = LocalContext.current
 
@@ -69,7 +73,7 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel()) {
 
     Column(
         Modifier
-            .background(White)
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
         CenterAlignedTopAppBar(
@@ -83,7 +87,17 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel()) {
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        val statusTheme = mainActivityViewModel.statusThemeFlow.first()
+                        if (statusTheme == TypeTheme.DARK.typeTheme) {
+                            mainActivityViewModel.onThemeChanged(TypeTheme.LIGHT.typeTheme)
+                        } else {
+                            mainActivityViewModel.onThemeChanged(TypeTheme.DARK.typeTheme)
+                        }
+                        (context as? Activity)?.recreate()
+                    }
+                }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_change_theme),
                         contentDescription = "Change Theme Icon",
@@ -120,7 +134,7 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel()) {
                         contentColor = MaterialTheme.colorScheme.background
                     )
                 },
-                onRefresh = { viewModel.refresh() }
+                onRefresh = { mainScreenViewModel.refresh() }
             ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(120.dp),
@@ -128,17 +142,17 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel()) {
                     verticalArrangement = Arrangement.Top,
                     horizontalArrangement = Arrangement.Start,
                     modifier = Modifier.fillMaxSize(),
-                    state = viewModel.stateLazyColumn,
+                    state = mainScreenViewModel.stateLazyColumn,
                 ) {
-                    items(viewModel.movieList.size) { index ->
+                    items(mainScreenViewModel.movieList.size) { index ->
                         rowMovie(
-                            movieItem = viewModel.movieList[index],
+                            movieItem = mainScreenViewModel.movieList[index],
                             snackbarHostState,
                             coroutineScope
                         )
                     }
 
-                    if (viewModel.isShowLoadingData.value && viewModel.movieList.isNotEmpty()) {
+                    if (mainScreenViewModel.isShowLoadingData.value && mainScreenViewModel.movieList.isNotEmpty()) {
                         item {
                             Box(
                                 modifier = Modifier
@@ -166,22 +180,22 @@ fun MainScreen(viewModel: MainScreenViewModel = hiltViewModel()) {
 
     }
 
-    viewModel.stateLazyColumn.OnBottomReached {
-        if (!viewModel.isShowLoadingData.value) {
-            viewModel.isShowLoadingData(true)
-            viewModel.getNextPage()
+    mainScreenViewModel.stateLazyColumn.OnBottomReached {
+        if (!mainScreenViewModel.isShowLoadingData.value) {
+            mainScreenViewModel.isShowLoadingData(true)
+            mainScreenViewModel.getNextPage()
         }
     }
 
     renderUi(
-        viewModel,
+        mainScreenViewModel,
         coroutineScope,
         snackbarHostState,
-        viewModel.isShowLoadingData,
+        mainScreenViewModel.isShowLoadingData,
         swipeRefreshState
     )
 
-    getData(viewModel, coroutineScope)
+    getData(mainScreenViewModel, coroutineScope)
 
     BackHandler { whenUserWantToExitApp(context, coroutineScope, snackbarHostState) }
 }

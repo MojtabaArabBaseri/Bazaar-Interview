@@ -5,16 +5,17 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import ir.millennium.bazaar.presentation.activity.MainActivityViewModel
 import ir.millennium.bazaar.presentation.screens.mainScreen.MainScreen
 import ir.millennium.bazaar.presentation.screens.mainScreen.MainScreenViewModel
 
-fun NavGraphBuilder.appGraph(navController: NavController) {
+fun NavGraphBuilder.appGraph(mainActivityViewModel: MainActivityViewModel) {
 
     navigation(startDestination = Screens.MainScreenRoute.route, route = Screens.AppRoute.route) {
 
         composable(route = Screens.MainScreenRoute.route) {
-            val mainActivityViewModel = hiltViewModel<MainScreenViewModel>(it)
-            MainScreen(viewModel = mainActivityViewModel)
+            val mainScreenViewModel = hiltViewModel<MainScreenViewModel>(it)
+            MainScreen(mainScreenViewModel = mainScreenViewModel, mainActivityViewModel)
         }
     }
 }

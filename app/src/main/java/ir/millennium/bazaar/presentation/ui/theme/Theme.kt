@@ -7,7 +7,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ir.millennium.bazaar.domain.entity.TypeTheme
 
@@ -37,7 +36,6 @@ private val LightColorPalette = lightColorScheme(
 @Composable
 fun BazaarTheme(
     typeTheme: Int = TypeTheme.LIGHT.typeTheme,
-    authScreens: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colors = if (typeTheme == TypeTheme.DARK.typeTheme) {
@@ -53,15 +51,12 @@ fun BazaarTheme(
             LightCustomColorsPalette
         }
 
-    if (authScreens && (typeTheme == TypeTheme.DARK.typeTheme)) {
-        rememberSystemUiController().setSystemBarsColor(color = Color(0xAA000000))
-        rememberSystemUiController().setNavigationBarColor(color = Black)
-    } else if (!authScreens && typeTheme == TypeTheme.DARK.typeTheme) {
+    if (typeTheme == TypeTheme.DARK.typeTheme) {
         rememberSystemUiController().setSystemBarsColor(color = Black)
         rememberSystemUiController().setNavigationBarColor(color = Black)
     } else {
-        rememberSystemUiController().setSystemBarsColor(StatusbarLightColor)
-        rememberSystemUiController().setNavigationBarColor(color = NavigationBottomLightColor)
+        rememberSystemUiController().setSystemBarsColor(color = White)
+        rememberSystemUiController().setNavigationBarColor(color = White)
     }
 
     CompositionLocalProvider(
