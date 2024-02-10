@@ -1,8 +1,6 @@
 package ir.millennium.bazaar.di.module
 
 import android.content.Context
-import android.net.ConnectivityManager
-import androidx.multidex.MultiDexApplication
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -10,10 +8,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import ir.millennium.bazaar.core.utils.AuxiliaryFunctionsManager
 import ir.millennium.bazaar.data.dataSource.remote.ApiService
 import ir.millennium.bazaar.data.repository.remote.RemoteRepositoryImpl
 import ir.millennium.bazaar.di.qualifiers.OnlineInterceptor
-import ir.millennium.bazaar.di.qualifiers.StatusNetwork
 import ir.millennium.bazaar.presentation.utils.Constants
 import ir.millennium.bazaar.presentation.utils.Constants.CACHE_SIZE_FOR_RETROFIT
 import ir.millennium.bazaar.presentation.utils.Constants.HEADER_CACHE_CONTROL
@@ -145,10 +143,10 @@ object NetworkModule {
     @Provides
     fun provideOfflineIntercepter(
         @ApplicationContext context: Context,
-        @StatusNetwork statusNetwork: Boolean
+        auxiliaryFunctionsManager: AuxiliaryFunctionsManager
     ): Interceptor = Interceptor { chain ->
         val originalResponse: Response = chain.proceed(chain.request())
-        if (statusNetwork) {
+        if (auxiliaryFunctionsManager.isNetworkConnected(context)) {
             val maxAge = 60 * 60 * 24 // read from cache for 1 day
             originalResponse.newBuilder()
                 .header("Cache-Control", "public, max-age=$maxAge")
@@ -170,12 +168,4 @@ object NetworkModule {
     @Provides
     fun provideGson(): Gson = GsonBuilder().serializeNulls().create()
 
-    @Singleton
-    @Provides
-    @StatusNetwork
-    fun provideStatusNetwork(@ApplicationContext context: Context): Boolean {
-        val cm =
-            context.getSystemService(MultiDexApplication.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.activeNetworkInfo != null
-    }
 }

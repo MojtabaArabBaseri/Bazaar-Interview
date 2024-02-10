@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Bazzar</string>
+    <string name="app_name">Bazaar</string>
+    <string name="discover">Discover</string>
+    <string name="connection_glitch">Connection glitch</string>
+    <string name="load_from_database">Load from Database</string>
+    <string name="retry">retry</string>
+    <string name="connection_lost_message">Seems like there\'s an internet\nconnection problem</string>
+    <string name="message_when_user_exit_application">Click Again To Exit The Application</string>
 </resources>
