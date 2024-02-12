@@ -46,6 +46,7 @@ import ir.millennium.bazaar.presentation.ui.theme.LightNavyColor
 import ir.millennium.bazaar.presentation.ui.theme.LocalCustomColorsPalette
 import ir.millennium.bazaar.presentation.ui.theme.NavyColor
 import ir.millennium.bazaar.presentation.utils.Constants.BACK_PRESSED
+import ir.millennium.bazaar.presentation.utils.Constants.SPLASH_DISPLAY_LENGTH
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,7 +61,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(coroutineScope) {
-        delay(3000)
+        delay(SPLASH_DISPLAY_LENGTH)
         viewModel.isLoadingData.value = true
     }
 

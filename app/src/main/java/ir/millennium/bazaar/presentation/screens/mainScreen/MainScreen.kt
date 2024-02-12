@@ -115,7 +115,7 @@ fun MainScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = LocalCustomColorsPalette.current.toolbarColor
+                containerColor = MaterialTheme.colorScheme.background
             )
         )
 

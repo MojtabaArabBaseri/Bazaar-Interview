@@ -47,11 +47,11 @@ fun rowMovie(
     Card(
         modifier = Modifier
             .padding(top = 6.dp)
-            .clip(RoundedCornerShape(dimensionResource(id = R.dimen.size_radius_editText)))
+            .clip(RoundedCornerShape(dimensionResource(id = R.dimen.size_radius_card_view)))
             .clickable {
                 coroutineScope.launch { movieItem.title?.let { snackbarHostState.showSnackbar(it) } }
             },
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.size_radius_editText)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.size_radius_card_view)),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {

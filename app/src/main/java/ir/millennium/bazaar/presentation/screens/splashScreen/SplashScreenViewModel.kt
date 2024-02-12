@@ -10,5 +10,7 @@ import javax.inject.Inject
 class SplashScreenViewModel @Inject constructor(
     val auxiliaryFunctionsManager: AuxiliaryFunctionsManager
 ) : ViewModel() {
+
     var isLoadingData = mutableStateOf(false)
+
 }
