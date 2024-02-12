@@ -1,7 +1,6 @@
 package ir.millennium.bazaar.presentation.navigation
 
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
