@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.millennium.bazaar.core.utils.AuxiliaryFunctionsManager
 import ir.millennium.bazaar.data.dataSource.remote.UiState
 import ir.millennium.bazaar.data.model.remote.MovieItem
+import ir.millennium.bazaar.data.repository.local.LocalRepositoryImpl
 import ir.millennium.bazaar.domain.usecase.GetMovieListUseCase
 import ir.millennium.bazaar.presentation.utils.Constants
 import kotlinx.coroutines.Dispatchers
@@ -17,11 +19,14 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val getMovieListUseCase: GetMovieListUseCase
+    private val getMovieListUseCase: GetMovieListUseCase,
+    private val localRepositoryImpl: LocalRepositoryImpl,
+    private val auxiliaryFunctionsManager: AuxiliaryFunctionsManager
 ) : ViewModel() {
 
     val stateLazyColumn = LazyGridState()
@@ -37,22 +42,37 @@ class MainScreenViewModel @Inject constructor(
     private var currentPage = 1
 
     private val headerMap = mutableMapOf<String, String>()
-    val params = mutableMapOf<String, Any>()
+    private val params = mutableMapOf<String, Any>()
 
     init {
         headerMap["Authorization"] = Constants.BEARER_TOKEN
         params["language"] = "en-US"
         params["page"] = currentPage
+        getMovieList()
     }
 
-    fun getMovieList(params: MutableMap<String, Any>) {
+    private fun getMovieList() {
+        if (auxiliaryFunctionsManager.isNetworkConnected()) {
+            getMovieListFromRemote()
+        } else {
+            getMovieListFromDatabase()
+        }
+    }
+
+    private fun getMovieListFromRemote() {
 
         params.replace("page", currentPage)
 
         getMovieListUseCase.getArticles(headerMap, params)
             .flowOn(Dispatchers.IO)
             .map { movieList ->
-                movieList.results?.let { this.movieList.addAll(movieList.results) }
+                movieList.results?.let {
+                    this.movieList.addAll(movieList.results)
+                    if (currentPage == 1) {
+                        localRepositoryImpl.clearDatabase()
+                    }
+                    localRepositoryImpl.saveMovieListToDatabase(movieList.results)
+                }
                 _uiState.value = UiState.Success(this.movieList)
             }
             .onStart {
@@ -64,15 +84,29 @@ class MainScreenViewModel @Inject constructor(
 
     }
 
+    private fun getMovieListFromDatabase() {
+        viewModelScope.launch {
+            movieList.addAll(localRepositoryImpl.getMovieList())
+        }
+    }
+
     fun refresh() {
         currentPage = 1
         movieList.clear()
-        getMovieList(params)
+        getMovieList()
     }
 
     fun getNextPage() {
         currentPage++
-        getMovieList(params)
+        if (auxiliaryFunctionsManager.isNetworkConnected()) {
+            getMovieListFromRemote()
+        }
+    }
+
+    fun retryRequest() {
+        if (auxiliaryFunctionsManager.isNetworkConnected()) {
+            getMovieListFromRemote()
+        }
     }
 
     fun isShowLoadingData(isShow: Boolean) {

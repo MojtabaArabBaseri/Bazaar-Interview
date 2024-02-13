@@ -5,11 +5,12 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Build.VERSION_CODES
 import androidx.multidex.MultiDexApplication
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-open class AuxiliaryFunctionsManager @Inject constructor() {
+open class AuxiliaryFunctionsManager @Inject constructor(@ApplicationContext val context: Context) {
 
     fun getVersionAndroid(): String {
         val builder = StringBuilder()
@@ -35,7 +36,7 @@ open class AuxiliaryFunctionsManager @Inject constructor() {
         return builder.toString()
     }
 
-    open fun isNetworkConnected(context: Context): Boolean {
+    open fun isNetworkConnected(): Boolean {
         val cm =
             context.getSystemService(MultiDexApplication.CONNECTIVITY_SERVICE) as ConnectivityManager
         return cm.activeNetworkInfo != null

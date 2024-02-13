@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -24,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -70,114 +73,120 @@ fun MainScreen(
     val swipeRefreshState = rememberSwipeRefreshState(false)
 
     val snackbarHostState = remember { SnackbarHostState() }
-
-    Column(
-        Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
+    Surface(
+        modifier = Modifier
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        CenterAlignedTopAppBar(
-            windowInsets = WindowInsets(top = 0, bottom = 0),
-            title = {
-                Text(
-                    text = stringResource(id = R.string.discover),
-                    color = LocalCustomColorsPalette.current.textColorPrimary,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = {
-                    coroutineScope.launch {
-                        val statusTheme = mainActivityViewModel.statusThemeFlow.first()
-                        if (statusTheme == TypeTheme.DARK.typeTheme) {
-                            mainActivityViewModel.onThemeChanged(TypeTheme.LIGHT.typeTheme)
-                        } else {
-                            mainActivityViewModel.onThemeChanged(TypeTheme.DARK.typeTheme)
-                        }
-                        (context as? Activity)?.recreate()
-                    }
-                }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_change_theme),
-                        contentDescription = "Change Theme Icon",
-                        tint = LocalCustomColorsPalette.current.iconColorPrimary
-                    )
-                }
-            },
-            actions = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(id = R.mipmap.bazaar_logo),
-                        contentDescription = "Change Change Icon",
-                        tint = Color.Unspecified
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background
-            )
-        )
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            SwipeRefresh(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                state = swipeRefreshState,
-                indicator = { state, trigger ->
-                    SwipeRefreshIndicator(
-                        state = state,
-                        refreshTriggerDistance = trigger,
-                        scale = true,
-                        backgroundColor = MaterialTheme.colorScheme.onBackground,
-                        contentColor = MaterialTheme.colorScheme.background
+        Column(
+            Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+        ) {
+            CenterAlignedTopAppBar(
+                windowInsets = WindowInsets(top = 0, bottom = 0),
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.discover),
+                        color = LocalCustomColorsPalette.current.textColorPrimary,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
-                onRefresh = { mainScreenViewModel.refresh() }
-            ) {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(120.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.fillMaxSize(),
-                    state = mainScreenViewModel.stateLazyColumn,
-                ) {
-                    items(mainScreenViewModel.movieList.size) { index ->
-                        rowMovie(
-                            movieItem = mainScreenViewModel.movieList[index],
-                            snackbarHostState,
-                            coroutineScope
+                navigationIcon = {
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            val statusTheme = mainActivityViewModel.statusThemeFlow.first()
+                            if (statusTheme == TypeTheme.DARK.typeTheme) {
+                                mainActivityViewModel.onThemeChanged(TypeTheme.LIGHT.typeTheme)
+                            } else {
+                                mainActivityViewModel.onThemeChanged(TypeTheme.DARK.typeTheme)
+                            }
+                            (context as? Activity)?.recreate()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_change_theme),
+                            contentDescription = "Change Theme Icon",
+                            tint = LocalCustomColorsPalette.current.iconColorPrimary
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(id = R.mipmap.bazaar_logo),
+                            contentDescription = "Change Change Icon",
+                            tint = Color.Unspecified
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
 
-                    if (mainScreenViewModel.isShowLoadingData.value && mainScreenViewModel.movieList.isNotEmpty()) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            ) {
-                                CircularProgressIndicator(
+            Box(modifier = Modifier.fillMaxSize()) {
+                SwipeRefresh(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background),
+                    state = swipeRefreshState,
+                    indicator = { state, trigger ->
+                        SwipeRefreshIndicator(
+                            state = state,
+                            refreshTriggerDistance = trigger,
+                            scale = true,
+                            backgroundColor = MaterialTheme.colorScheme.onBackground,
+                            contentColor = MaterialTheme.colorScheme.background
+                        )
+                    },
+                    onRefresh = { mainScreenViewModel.refresh() }
+                ) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(120.dp),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier.fillMaxSize(),
+                        state = mainScreenViewModel.stateLazyColumn,
+                    ) {
+                        items(mainScreenViewModel.movieList.size) { index ->
+                            rowMovie(
+                                movieItem = mainScreenViewModel.movieList[index],
+                                snackbarHostState,
+                                coroutineScope
+                            )
+                        }
+
+                        if (mainScreenViewModel.isShowLoadingData.value && mainScreenViewModel.movieList.isNotEmpty()) {
+                            item {
+                                Box(
                                     modifier = Modifier
-                                        .size(16.dp)
-                                        .align(Alignment.Center),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    strokeWidth = 2.dp
-                                )
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                            .align(Alignment.Center),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        strokeWidth = 2.dp
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
             }
 
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
         }
-
     }
 
     mainScreenViewModel.stateLazyColumn.OnBottomReached {
@@ -195,18 +204,7 @@ fun MainScreen(
         swipeRefreshState
     )
 
-    getData(mainScreenViewModel, coroutineScope)
-
     BackHandler { whenUserWantToExitApp(context, coroutineScope, snackbarHostState) }
-}
-
-@Composable
-fun getData(viewModel: MainScreenViewModel, coroutineScope: CoroutineScope) {
-    LaunchedEffect(coroutineScope) {
-        if (viewModel.movieList.isEmpty()) {
-            viewModel.getMovieList(viewModel.params)
-        }
-    }
 }
 
 @Composable
@@ -246,7 +244,7 @@ fun renderUi(
                         when (snackbarResult) {
                             SnackbarResult.Dismissed -> {}
                             SnackbarResult.ActionPerformed -> {
-                                viewModel.getMovieList(viewModel.params)
+                                viewModel.retryRequest()
                             }
                         }
                     }

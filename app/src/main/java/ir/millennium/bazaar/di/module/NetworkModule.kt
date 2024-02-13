@@ -142,11 +142,10 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideOfflineIntercepter(
-        @ApplicationContext context: Context,
         auxiliaryFunctionsManager: AuxiliaryFunctionsManager
     ): Interceptor = Interceptor { chain ->
         val originalResponse: Response = chain.proceed(chain.request())
-        if (auxiliaryFunctionsManager.isNetworkConnected(context)) {
+        if (auxiliaryFunctionsManager.isNetworkConnected()) {
             val maxAge = 60 * 60 * 24 // read from cache for 1 day
             originalResponse.newBuilder()
                 .header("Cache-Control", "public, max-age=$maxAge")

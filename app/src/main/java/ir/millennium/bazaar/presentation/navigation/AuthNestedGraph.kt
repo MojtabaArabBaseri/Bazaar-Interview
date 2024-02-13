@@ -1,5 +1,8 @@
 package ir.millennium.bazaar.presentation.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -15,7 +18,9 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
         route = Screens.AuthRoute.route
     ) {
 
-        composable(route = Screens.SplashScreenRoute.route) {
+        composable(route = Screens.SplashScreenRoute.route,
+            enterTransition = { slideInHorizontally(animationSpec = tween(700)) },
+            exitTransition = { slideOutHorizontally(animationSpec = tween(700)) }) {
             val splashScreenViewModel = hiltViewModel<SplashScreenViewModel>(it)
             SplashScreen(
                 navController = navController,
