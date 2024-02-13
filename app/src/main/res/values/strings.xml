@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bazaar</string>
+    <string name="app_name">Bazaar-MojtabaArabBaseri</string>
     <string name="discover">Discover</string>
     <string name="connection_glitch">Connection glitch</string>
     <string name="load_from_database">Load from Database</string>

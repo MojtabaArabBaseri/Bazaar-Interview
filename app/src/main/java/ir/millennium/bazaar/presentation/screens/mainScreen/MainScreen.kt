@@ -1,9 +1,9 @@
 package ir.millennium.bazaar.presentation.screens.mainScreen
 
 import android.app.Activity
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -52,8 +53,8 @@ import ir.millennium.bazaar.data.dataSource.remote.UiState
 import ir.millennium.bazaar.domain.entity.TypeTheme
 import ir.millennium.bazaar.presentation.activity.MainActivityViewModel
 import ir.millennium.bazaar.presentation.ui.theme.LocalCustomColorsPalette
-import ir.millennium.bazaar.presentation.utils.Constants.BACK_PRESSED
 import ir.millennium.bazaar.presentation.utils.OnBottomReached
+import ir.millennium.bazaar.presentation.utils.showForExitApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -88,6 +89,14 @@ fun MainScreen(
                 windowInsets = WindowInsets(top = 0, bottom = 0),
                 title = {
                     Text(
+                        modifier = Modifier.clickable {
+                            coroutineScope.launch {
+                                mainScreenViewModel.stateLazyColumn.animateScrollToItem(
+                                    0,
+                                    0
+                                )
+                            }
+                        },
                         text = stringResource(id = R.string.discover),
                         color = LocalCustomColorsPalette.current.textColorPrimary,
                         fontWeight = FontWeight.Bold,
@@ -153,7 +162,7 @@ fun MainScreen(
                         state = mainScreenViewModel.stateLazyColumn,
                     ) {
                         items(mainScreenViewModel.movieList.size) { index ->
-                            rowMovie(
+                            RowMovie(
                                 movieItem = mainScreenViewModel.movieList[index],
                                 snackbarHostState,
                                 coroutineScope
@@ -165,7 +174,9 @@ fun MainScreen(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp)
+                                        .height(190.dp)
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     CircularProgressIndicator(
                                         modifier = Modifier
@@ -204,7 +215,7 @@ fun MainScreen(
         swipeRefreshState
     )
 
-    BackHandler { whenUserWantToExitApp(context, coroutineScope, snackbarHostState) }
+    BackHandler { snackbarHostState.showForExitApp(context, coroutineScope) }
 }
 
 @Composable
@@ -254,17 +265,4 @@ fun renderUi(
             }
         }
     }
-}
-
-fun whenUserWantToExitApp(
-    context: Context,
-    coroutineScope: CoroutineScope,
-    snackbarHostState: SnackbarHostState
-) {
-    if (BACK_PRESSED + 2000 > System.currentTimeMillis()) {
-        (context as? Activity)?.finish()
-    } else {
-        coroutineScope.launch { snackbarHostState.showSnackbar(context.getString(R.string.message_when_user_exit_application)) }
-    }
-    BACK_PRESSED = System.currentTimeMillis()
 }

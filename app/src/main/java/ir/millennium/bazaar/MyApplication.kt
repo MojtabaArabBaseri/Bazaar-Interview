@@ -1,4 +1,4 @@
-package ir.millennium.bazaar.presentation
+package ir.millennium.bazaar
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

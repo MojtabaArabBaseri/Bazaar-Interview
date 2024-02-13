@@ -34,8 +34,7 @@ class LocalRepositoryImpl @Inject constructor(
 
     override fun clearDatabase() {
         applicationScope.launch {
-            if (movieDao.getMovieList().isNotEmpty())
-                movieDao.clear()
+            movieDao.clear()
         }
     }
 }

@@ -36,7 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun rowMovie(
+fun RowMovie(
     movieItem: MovieItem,
     snackbarHostState: SnackbarHostState,
     coroutineScope: CoroutineScope
