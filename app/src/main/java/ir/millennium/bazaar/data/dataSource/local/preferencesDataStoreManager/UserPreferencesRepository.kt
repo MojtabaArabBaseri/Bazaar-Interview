@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import ir.millennium.bazaar.domain.entity.TypeTheme
+import ir.millennium.bazaar.core.theme.enums.TypeTheme
 import ir.millennium.bazaar.presentation.utils.Constants.USER_PREFERENCES_REPOSITORY
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map

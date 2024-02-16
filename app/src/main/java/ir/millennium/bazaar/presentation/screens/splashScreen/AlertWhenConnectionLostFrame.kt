@@ -31,10 +31,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ir.millennium.bazaar.R
-import ir.millennium.bazaar.presentation.ui.theme.GrayDark
-import ir.millennium.bazaar.presentation.ui.theme.LightNavyColor
-import ir.millennium.bazaar.presentation.ui.theme.LocalCustomColorsPalette
-import ir.millennium.bazaar.presentation.ui.theme.NavyColor
+import ir.millennium.bazaar.core.theme.GrayDark
+import ir.millennium.bazaar.core.theme.LightNavyColor
+import ir.millennium.bazaar.core.theme.LocalCustomColorsPalette
+import ir.millennium.bazaar.core.theme.NavyColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

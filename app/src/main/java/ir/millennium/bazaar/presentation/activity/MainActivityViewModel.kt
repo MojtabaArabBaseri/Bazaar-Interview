@@ -3,8 +3,8 @@ package ir.millennium.bazaar.presentation.activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.millennium.bazaar.core.theme.enums.TypeTheme
 import ir.millennium.bazaar.data.dataSource.local.preferencesDataStoreManager.UserPreferencesRepository
-import ir.millennium.bazaar.domain.entity.TypeTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first

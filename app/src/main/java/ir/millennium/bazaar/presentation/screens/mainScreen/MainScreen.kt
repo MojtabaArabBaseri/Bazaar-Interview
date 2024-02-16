@@ -49,10 +49,10 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import ir.millennium.bazaar.R
+import ir.millennium.bazaar.core.theme.LocalCustomColorsPalette
+import ir.millennium.bazaar.core.theme.enums.TypeTheme
 import ir.millennium.bazaar.data.dataSource.remote.UiState
-import ir.millennium.bazaar.domain.entity.TypeTheme
 import ir.millennium.bazaar.presentation.activity.MainActivityViewModel
-import ir.millennium.bazaar.presentation.ui.theme.LocalCustomColorsPalette
 import ir.millennium.bazaar.presentation.utils.OnBottomReached
 import ir.millennium.bazaar.presentation.utils.showForExitApp
 import kotlinx.coroutines.CoroutineScope

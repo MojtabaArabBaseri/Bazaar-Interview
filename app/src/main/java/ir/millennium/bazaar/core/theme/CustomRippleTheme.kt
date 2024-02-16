@@ -1,11 +1,10 @@
-package ir.millennium.bazaar.presentation.ui.theme
+package ir.millennium.bazaar.core.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import ir.millennium.bazaar.presentation.ui.theme.LocalCustomColorsPalette
 
 object CustomRippleTheme : RippleTheme {
 

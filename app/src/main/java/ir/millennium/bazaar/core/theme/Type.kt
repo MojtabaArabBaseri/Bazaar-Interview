@@ -1,4 +1,4 @@
-package ir.millennium.bazaar.presentation.ui.theme
+package ir.millennium.bazaar.core.theme
 
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font

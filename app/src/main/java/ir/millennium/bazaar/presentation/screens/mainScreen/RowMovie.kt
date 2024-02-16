@@ -29,8 +29,8 @@ import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ir.millennium.bazaar.R
+import ir.millennium.bazaar.core.theme.LocalCustomColorsPalette
 import ir.millennium.bazaar.data.model.remote.MovieItem
-import ir.millennium.bazaar.presentation.ui.theme.LocalCustomColorsPalette
 import ir.millennium.bazaar.presentation.utils.Constants.BASIC_URL_IMAGE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

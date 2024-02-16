@@ -1,4 +1,4 @@
-package ir.millennium.bazaar.domain.entity
+package ir.millennium.bazaar.core.theme.enums
 
 enum class TypeTheme(val typeTheme: Int) {
     LIGHT(1), DARK(2);

@@ -22,7 +22,7 @@ class LocalRepositoryImpl @Inject constructor(
 
     override suspend fun saveMovieToDatabase(movieItem: MovieItem) {
         return withContext(applicationScope.coroutineContext) {
-            movieDao.insertMovie(movieItem.mapToEntity())
+            val x = movieDao.insertMovie(movieItem.mapToEntity())
         }
     }
 

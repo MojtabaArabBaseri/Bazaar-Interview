@@ -1,7 +1,7 @@
 package ir.millennium.bazaar.data.mapper
 
-import ir.millennium.bazaar.data.model.local.MovieEntity
 import ir.millennium.bazaar.data.model.remote.MovieItem
+import ir.millennium.bazaar.domain.entity.MovieEntity
 
 fun MovieEntity.mapToUiModel() =
     MovieItem(title = this.title, posterPath = this.poster)

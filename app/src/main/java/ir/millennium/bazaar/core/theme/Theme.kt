@@ -1,4 +1,4 @@
-package ir.millennium.bazaar.presentation.ui.theme
+package ir.millennium.bazaar.core.theme
 
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.MaterialTheme
@@ -8,7 +8,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import ir.millennium.bazaar.domain.entity.TypeTheme
+import ir.millennium.bazaar.core.theme.enums.TypeTheme
 
 private val DarkColorPalette = darkColorScheme(
     primary = Blue,

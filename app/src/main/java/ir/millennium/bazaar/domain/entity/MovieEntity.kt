@@ -1,4 +1,4 @@
-package ir.millennium.bazaar.data.model.local
+package ir.millennium.bazaar.domain.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
