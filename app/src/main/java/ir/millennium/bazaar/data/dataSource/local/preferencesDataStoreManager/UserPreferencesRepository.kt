@@ -28,7 +28,6 @@ class UserPreferencesRepository @Inject constructor(@ApplicationContext appConte
         val TYPE_THEME = intPreferencesKey("type_theme")
     }
 
-
     suspend fun setStatusTheme(isLightThemeActive: Int) {
         settingsDataStore.edit { preferences ->
             preferences[PreferencesKeys.TYPE_THEME] = isLightThemeActive

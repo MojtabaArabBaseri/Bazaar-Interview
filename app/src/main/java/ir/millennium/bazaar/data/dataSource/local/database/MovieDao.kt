@@ -1,23 +1,20 @@
 package ir.millennium.bazaar.data.dataSource.local.database
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import ir.millennium.bazaar.domain.entity.MovieEntity
 
 @Dao
 interface MovieDao {
 
-    @Query("SELECT * FROM movie ORDER BY id ASC")
-    suspend fun getMovieList(): List<MovieEntity>
+    @Upsert
+    suspend fun upsertAll(beers: List<MovieEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMovie(movieEntity: MovieEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMovieList(movieEntity: List<MovieEntity>)
+    @Query("SELECT * FROM movie")
+    fun pagingSource(): PagingSource<Int, MovieEntity>
 
     @Query("DELETE FROM movie")
-    suspend fun clear()
+    suspend fun clearAll()
 }

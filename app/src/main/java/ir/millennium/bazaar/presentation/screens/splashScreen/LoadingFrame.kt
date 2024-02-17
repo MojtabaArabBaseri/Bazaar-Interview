@@ -43,12 +43,12 @@ fun LoadingFrame() {
                 tint = Color.Unspecified
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(32.dp),
                 color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 4.dp,
+                strokeWidth = 6.dp,
                 strokeCap = StrokeCap.Round,
             )
         }

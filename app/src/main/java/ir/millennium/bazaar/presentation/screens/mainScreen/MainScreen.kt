@@ -1,9 +1,9 @@
 package ir.millennium.bazaar.presentation.screens.mainScreen
 
 import android.app.Activity
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -44,19 +43,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import ir.millennium.bazaar.R
 import ir.millennium.bazaar.core.theme.LocalCustomColorsPalette
 import ir.millennium.bazaar.core.theme.enums.TypeTheme
-import ir.millennium.bazaar.data.dataSource.remote.UiState
+import ir.millennium.bazaar.data.model.remote.MovieItem
 import ir.millennium.bazaar.presentation.activity.MainActivityViewModel
-import ir.millennium.bazaar.presentation.utils.OnBottomReached
 import ir.millennium.bazaar.presentation.utils.showForExitApp
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -66,6 +65,7 @@ fun MainScreen(
     mainScreenViewModel: MainScreenViewModel,
     mainActivityViewModel: MainActivityViewModel
 ) {
+    val movieList = mainScreenViewModel.moviePagingFlow.collectAsLazyPagingItems()
 
     val context = LocalContext.current
 
@@ -74,85 +74,79 @@ fun MainScreen(
     val swipeRefreshState = rememberSwipeRefreshState(false)
 
     val snackbarHostState = remember { SnackbarHostState() }
-    Surface(
-        modifier = Modifier
+
+    Column(
+        Modifier
             .statusBarsPadding()
-            .navigationBarsPadding(),
-        color = MaterialTheme.colorScheme.background
+            .navigationBarsPadding()
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
     ) {
-        Column(
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxSize()
-        ) {
-            CenterAlignedTopAppBar(
-                windowInsets = WindowInsets(top = 0, bottom = 0),
-                title = {
-                    Text(
-                        modifier = Modifier.clickable {
-                            coroutineScope.launch {
-                                mainScreenViewModel.stateLazyColumn.animateScrollToItem(
-                                    0,
-                                    0
-                                )
-                            }
-                        },
-                        text = stringResource(id = R.string.discover),
-                        color = LocalCustomColorsPalette.current.textColorPrimary,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleLarge
+        CenterAlignedTopAppBar(
+            windowInsets = WindowInsets(top = 0, bottom = 0),
+            title = {
+                Text(
+                    text = stringResource(id = R.string.discover),
+                    color = LocalCustomColorsPalette.current.textColorPrimary,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        val statusTheme = mainActivityViewModel.statusThemeFlow.first()
+                        if (statusTheme == TypeTheme.DARK.typeTheme) {
+                            mainActivityViewModel.onThemeChanged(TypeTheme.LIGHT.typeTheme)
+                        } else {
+                            mainActivityViewModel.onThemeChanged(TypeTheme.DARK.typeTheme)
+                        }
+                        (context as? Activity)?.recreate()
+                    }
+                }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_change_theme),
+                        contentDescription = "Change Theme Icon",
+                        tint = LocalCustomColorsPalette.current.iconColorPrimary
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(id = R.mipmap.bazaar_logo),
+                        contentDescription = "Change Change Icon",
+                        tint = Color.Unspecified
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
+        )
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            SwipeRefresh(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                state = swipeRefreshState,
+                indicator = { state, trigger ->
+                    SwipeRefreshIndicator(
+                        state = state,
+                        refreshTriggerDistance = trigger,
+                        scale = true,
+                        backgroundColor = MaterialTheme.colorScheme.onBackground,
+                        contentColor = MaterialTheme.colorScheme.background
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        coroutineScope.launch {
-                            val statusTheme = mainActivityViewModel.statusThemeFlow.first()
-                            if (statusTheme == TypeTheme.DARK.typeTheme) {
-                                mainActivityViewModel.onThemeChanged(TypeTheme.LIGHT.typeTheme)
-                            } else {
-                                mainActivityViewModel.onThemeChanged(TypeTheme.DARK.typeTheme)
-                            }
-                            (context as? Activity)?.recreate()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_change_theme),
-                            contentDescription = "Change Theme Icon",
-                            tint = LocalCustomColorsPalette.current.iconColorPrimary
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(id = R.mipmap.bazaar_logo),
-                            contentDescription = "Change Change Icon",
-                            tint = Color.Unspecified
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
+                onRefresh = { movieList.refresh() }
+            ) {
 
-            Box(modifier = Modifier.fillMaxSize()) {
-                SwipeRefresh(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background),
-                    state = swipeRefreshState,
-                    indicator = { state, trigger ->
-                        SwipeRefreshIndicator(
-                            state = state,
-                            refreshTriggerDistance = trigger,
-                            scale = true,
-                            backgroundColor = MaterialTheme.colorScheme.onBackground,
-                            contentColor = MaterialTheme.colorScheme.background
-                        )
-                    },
-                    onRefresh = { mainScreenViewModel.refresh() }
-                ) {
+                if (movieList.loadState.refresh is LoadState.Loading) {
+                    swipeRefreshState.isRefreshing = true
+                } else {
+                    swipeRefreshState.isRefreshing = false
                     LazyVerticalGrid(
                         columns = GridCells.Adaptive(120.dp),
                         contentPadding = PaddingValues(16.dp),
@@ -161,16 +155,16 @@ fun MainScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = mainScreenViewModel.stateLazyColumn,
                     ) {
-                        items(mainScreenViewModel.movieList.size) { index ->
+                        items(movieList.itemCount) { index ->
                             RowMovie(
-                                movieItem = mainScreenViewModel.movieList[index],
+                                movieItem = movieList[index]!!,
                                 snackbarHostState,
                                 coroutineScope
                             )
                         }
 
-                        if (mainScreenViewModel.isShowLoadingData.value && mainScreenViewModel.movieList.isNotEmpty()) {
-                            item {
+                        item {
+                            if (movieList.loadState.append is LoadState.Loading) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -180,7 +174,7 @@ fun MainScreen(
                                 ) {
                                     CircularProgressIndicator(
                                         modifier = Modifier
-                                            .size(16.dp)
+                                            .size(24.dp)
                                             .align(Alignment.Center),
                                         color = MaterialTheme.colorScheme.primary,
                                         strokeWidth = 2.dp
@@ -196,72 +190,46 @@ fun MainScreen(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
-
         }
     }
 
-    mainScreenViewModel.stateLazyColumn.OnBottomReached {
-        if (!mainScreenViewModel.isShowLoadingData.value) {
-            mainScreenViewModel.isShowLoadingData(true)
-            mainScreenViewModel.getNextPage()
+    LaunchedEffect(key1 = movieList.loadState) {
+        if (movieList.loadState.refresh is LoadState.Error) {
+            handleError(
+                context,
+                snackbarHostState,
+                coroutineScope,
+                (movieList.loadState.refresh as LoadState.Error).error.message!!,
+                movieList
+            )
+        }
+
+        if (movieList.loadState.append is LoadState.Error) {
+            handleError(
+                context,
+                snackbarHostState,
+                coroutineScope,
+                (movieList.loadState.append as LoadState.Error).error.message!!,
+                movieList
+            )
         }
     }
-
-    renderUi(
-        mainScreenViewModel,
-        coroutineScope,
-        snackbarHostState,
-        mainScreenViewModel.isShowLoadingData,
-        swipeRefreshState
-    )
 
     BackHandler { snackbarHostState.showForExitApp(context, coroutineScope) }
 }
 
-@Composable
-fun renderUi(
-    viewModel: MainScreenViewModel,
-    coroutineScope: CoroutineScope,
+fun handleError(
+    context: Context,
     snackbarHostState: SnackbarHostState,
-    isShowLoadingData: StateFlow<Boolean>,
-    swipeRefreshState: SwipeRefreshState
+    coroutineScope: CoroutineScope,
+    message: String,
+    movieList: LazyPagingItems<MovieItem>
 ) {
-    LaunchedEffect(coroutineScope) {
-        viewModel.uiState.collect { dataResource ->
-            when (dataResource) {
-                is UiState.Loading -> {
-                    if (!isShowLoadingData.value) {
-                        swipeRefreshState.isRefreshing = true
-                    }
-                }
-
-                is UiState.Success -> {
-                    if (isShowLoadingData.value) {
-                        viewModel.isShowLoadingData(false)
-                    } else {
-                        swipeRefreshState.isRefreshing = false
-                    }
-                }
-
-                is UiState.Error -> {
-                    if (swipeRefreshState.isRefreshing) {
-                        swipeRefreshState.isRefreshing = false
-                    }
-                    coroutineScope.launch {
-                        val snackbarResult = snackbarHostState.showSnackbar(
-                            dataResource.throwable.message.toString(),
-                            "retry"
-                        )
-                        when (snackbarResult) {
-                            SnackbarResult.Dismissed -> {}
-                            SnackbarResult.ActionPerformed -> {
-                                viewModel.retryRequest()
-                            }
-                        }
-                    }
-                }
-
-                else -> {}
+    coroutineScope.launch {
+        when (snackbarHostState.showSnackbar(message, context.getString(R.string.retry))) {
+            SnackbarResult.Dismissed -> {}
+            SnackbarResult.ActionPerformed -> {
+                movieList.retry()
             }
         }
     }

@@ -1,6 +1,10 @@
 package ir.millennium.bazaar.di.module
 
 import android.content.Context
+import android.util.Log
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -9,9 +13,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ir.millennium.bazaar.core.utils.AuxiliaryFunctionsManager
+import ir.millennium.bazaar.data.dataSource.local.database.AppDatabase
 import ir.millennium.bazaar.data.dataSource.remote.ApiService
-import ir.millennium.bazaar.data.repository.remote.RemoteRepositoryImpl
+import ir.millennium.bazaar.data.dataSource.remote.MovieRemoteMediator
 import ir.millennium.bazaar.di.qualifiers.OnlineInterceptor
+import ir.millennium.bazaar.domain.entity.MovieEntity
 import ir.millennium.bazaar.presentation.utils.Constants
 import ir.millennium.bazaar.presentation.utils.Constants.CACHE_SIZE_FOR_RETROFIT
 import ir.millennium.bazaar.presentation.utils.Constants.HEADER_CACHE_CONTROL
@@ -38,11 +44,6 @@ import javax.net.ssl.X509TrustManager
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
-    @Provides
-    @Singleton
-    fun provideRemoteRepository(apiService: ApiService): RemoteRepositoryImpl =
-        RemoteRepositoryImpl(apiService)
 
     @Singleton
     @Provides
@@ -112,7 +113,10 @@ object NetworkModule {
     @Provides
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
         val httpLoggingInterceptor =
-            HttpLoggingInterceptor { message -> Timber.d("Data On Http WebService: $message") }
+            HttpLoggingInterceptor { message ->
+                Log.d("Data On Http WebService: ", message)
+                Timber.d("Data On Http WebService: $message")
+            }
         httpLoggingInterceptor.apply {
             httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         }
@@ -166,5 +170,24 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideGson(): Gson = GsonBuilder().serializeNulls().create()
+
+    @OptIn(ExperimentalPagingApi::class)
+    @Provides
+    @Singleton
+    fun provideMoviePager(
+        appDatabase: AppDatabase,
+        apiService: ApiService
+    ): Pager<Int, MovieEntity> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            remoteMediator = MovieRemoteMediator(
+                appDatabase = appDatabase,
+                apiService = apiService
+            ),
+            pagingSourceFactory = {
+                appDatabase.movieDao().pagingSource()
+            }
+        )
+    }
 
 }

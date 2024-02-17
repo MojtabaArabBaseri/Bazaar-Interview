@@ -18,8 +18,8 @@ fun NavGraphBuilder.appGraph(mainActivityViewModel: MainActivityViewModel) {
         composable(route = Screens.MainScreenRoute.route,
             enterTransition = { slideInHorizontally(animationSpec = tween(700)) },
             exitTransition = { slideOutHorizontally(animationSpec = tween(700)) }) {
-            val mainScreenViewModel = hiltViewModel<MainScreenViewModel>(it)
-            MainScreen(mainScreenViewModel = mainScreenViewModel, mainActivityViewModel)
+            val mainScreenViewModel = hiltViewModel<MainScreenViewModel>()
+            MainScreen(mainScreenViewModel, mainActivityViewModel)
         }
     }
 }
